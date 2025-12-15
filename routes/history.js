@@ -4,9 +4,9 @@ var router = express.Router();
 const { getDb } = require('../db/mongo');
 const { getAccessToken } = require('../services/spotifyAuth');
 
-/* =========================
+/*
    Helpers: normalização
-========================= */
+*/
 function pickFirstImageUrl(images) {
   if (!Array.isArray(images) || images.length === 0) return null;
   return images[0]?.url || null;
@@ -32,10 +32,7 @@ function normTrack(t) {
   };
 }
 
-// Aceita step em vários formatos:
-//  - { fromArtist, toArtist, track }
-//  - { fromArtist, toArtist, chosenTrack: {...} }
-//  - { fromArtist, toArtist, music: {...} }
+
 function normStep(s) {
   if (!s) return null;
 
@@ -48,9 +45,9 @@ function normStep(s) {
   };
 }
 
-/* =========================
+/* 
    Spotify fetch + cache
-========================= */
+*/
 const cache = {
   artistImg: new Map(), // id -> url|null
   trackImg: new Map(),  // id -> url|null
@@ -78,7 +75,7 @@ async function artistImageById(id) {
   if (cache.artistImg.has(id)) return cache.artistImg.get(id);
 
   const r = await spotifyFetch(`/artists/${encodeURIComponent(id)}`);
-  const url = r.ok ? (r.json?.images?.[0]?.url || null) : null; // artist.images[0].url [web:425]
+  const url = r.ok ? (r.json?.images?.[0]?.url || null) : null; 
   cache.artistImg.set(id, url);
   return url;
 }
@@ -88,19 +85,19 @@ async function trackImageById(id) {
   if (cache.trackImg.has(id)) return cache.trackImg.get(id);
 
   const r = await spotifyFetch(`/tracks/${encodeURIComponent(id)}`);
-  const url = r.ok ? (r.json?.album?.images?.[0]?.url || null) : null; // track.album.images[0].url [web:267]
+  const url = r.ok ? (r.json?.album?.images?.[0]?.url || null) : null; 
   cache.trackImg.set(id, url);
   return url;
 }
 
-/* =========================
+/* 
    Enriquecimento de win
-========================= */
+*/
 async function enrichWin(win) {
-  // clone para não mexer no objeto original
+
   const w = JSON.parse(JSON.stringify(win || {}));
 
-  // Normaliza topo (aceita win.track ou win.lastTrack etc)
+  // Normaliza topo 
   w.fromArtist = normArtist(w.fromArtist);
   w.toArtist = normArtist(w.toArtist);
   w.track = normTrack(w.track || w.lastTrack || w.music || null);
@@ -109,7 +106,7 @@ async function enrichWin(win) {
   const stepsRaw = Array.isArray(w.steps) ? w.steps : [];
   w.steps = stepsRaw.map(normStep).filter(Boolean);
 
-  // Lista de ids a buscar (evita fetch repetido)
+  // Lista de ids a buscar
   const artistIds = new Set();
   const trackIds = new Set();
 
@@ -143,18 +140,18 @@ async function enrichWin(win) {
   return w;
 }
 
-/* =========================
+/*
    ROTAS
-========================= */
+*/
 
-// POST /api/history/win
+// POST
 router.post('/win', async (req, res, next) => {
   try {
     const b = req.body ?? {};
     const deviceId = String(b.deviceId ?? '').trim();
     if (!deviceId) return res.status(400).json({ ok: false, error: 'deviceId required' });
 
-    // Mantém sua validação mínima
+
     if (!b.fromArtist?.id || !b.toArtist?.id || !b.track?.id) {
       return res.status(400).json({ ok: false, error: 'fromArtist/toArtist/track required' });
     }
@@ -178,7 +175,6 @@ router.post('/win', async (req, res, next) => {
   }
 });
 
-// GET /api/history?deviceId=xxx  -> últimas 5 (enriquecidas)
 router.get('/', async (req, res, next) => {
   try {
     const deviceId = String(req.query.deviceId ?? '').trim();

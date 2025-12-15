@@ -1,7 +1,7 @@
 // public/javascripts/main.js
 
 const SEED_ARTISTS = [
-  // ===== POP (internacional) =====
+  // POP (internacional)
   'Anitta',
   'Beyoncé',
   'Lady Gaga',
@@ -54,7 +54,7 @@ const SEED_ARTISTS = [
   'Coldplay',
   'Camila Cabello',
 
-  // ===== HIP-HOP / R&B (internacional) =====
+  //HIP-HOP / R&B (internacional) 
   'Kendrick Lamar',
   'Drake',
   'Travis Scott',
@@ -72,7 +72,7 @@ const SEED_ARTISTS = [
   'Brent Faiyaz',
   'Chris Brown',
 
-  // ===== LATIN =====
+  //LATIN 
   'Bad Bunny',
   'J Balvin',
   'Shakira',
@@ -82,7 +82,7 @@ const SEED_ARTISTS = [
   'Ozuna',
   'Daddy Yankee',
 
-  // ===== ROCK / POP ROCK (internacional) =====
+  //ROCK / POP ROCK (internacional)
   'Queen',
   'The Beatles',
   'The Rolling Stones',
@@ -108,7 +108,7 @@ const SEED_ARTISTS = [
   'U2',
   'Bon Jovi',
 
-  // ===== BRASIL (pop / funk / rap / mpb / sertanejo) =====
+  //BRASIL (pop / funk / rap / mpb / sertanejo) 
   'Ludmilla',
   'IZA',
   'Pabllo Vittar',
@@ -143,7 +143,7 @@ const SEED_ARTISTS = [
   'Emicida',
   'Criolo',
 
-  // ===== BRASIL (rock / pop rock) =====
+  //BRASIL (rock / pop rock)
   'Legião Urbana',
   'Titãs',
   'Os Paralamas do Sucesso',

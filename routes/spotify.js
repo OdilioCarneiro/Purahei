@@ -5,7 +5,7 @@ const router = express.Router();
 console.log('SPOTIFY ROUTER CARREGOU (routes/spotify.js)');
 router.get('/ping', (req, res) => res.send('pong'));
 
-const { getAccessToken } = require('../services/spotifyAuth'); // ajuste se necessário
+const { getAccessToken } = require('../services/spotifyAuth');
 
 async function spotifyFetch(path) {
   const token = await getAccessToken();

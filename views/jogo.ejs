@@ -12,7 +12,6 @@
       <button class="game-back" type="button" onclick="window.location.href='/'">↩ VOLTAR</button>
 
       <div class="game-title-block">
-        <!-- NOVO: wrapper para alinhar logo + nome lado a lado -->
         <div class="brand">
           <img src="/assets/Icon_pureheir.svg" alt="Purheíre Logo" class="game-logo-img">
           <h1 class="game-logo">PURAHÉI</h1>
@@ -29,13 +28,13 @@
 
     <main class="game-main">
       <div class="game-sky" id="game-sky">
-        <!-- Fundo/estrelas NÃO são escalados -->
+
         <div class="star-layer"></div>
 
-        <!-- Linhas NÃO são escaladas -->
+
         <svg id="edges" class="edges" aria-hidden="true"></svg>
 
-        <!-- Apenas os cards ficam dentro do "mundo" que recebe scale() -->
+
         <div id="game-world" class="game-world">
           <div class="artist-card" id="card-left">
             <div class="artist-photo">
@@ -95,7 +94,7 @@
       </div>
     </div>
 
-    <!-- ESCOLHER PRÓXIMO ARTISTA -->
+
     <div id="artist-choices-overlay" class="overlay hidden">
       <div class="overlay-box">
         <h2>ESCOLHA O PRÓXIMO ARTISTA</h2>
@@ -107,7 +106,7 @@
       </div>
     </div>
 
-    <!-- PARABÉNS -->
+
     <div id="win-overlay" class="overlay hidden">
       <div class="overlay-box">
         <h2>PARABÉNS!</h2>
