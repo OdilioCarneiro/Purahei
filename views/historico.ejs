@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/stylesheets/historico.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <nav class="nav">
+      <a class="nav-left" href="/">HOME</a>
+      <div class="nav-right">
+        <a href="/about">SOBRE</a>
+        <a class="active" href="/historico">HISTÓRICO</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="page">
+    <h1 class="title">HISTÓRICO</h1>
+    <p class="subtitle">ÚLTIMAS 5 VITÓRIAS DESTE DISPOSITIVO.</p>
+
+    <section id="history-list" class="history-list"></section>
+
+    <div id="history-empty" class="empty hidden">
+      Ainda não há vitórias registradas neste dispositivo.
+    </div>
+  </main>
+
+  <script src="/javascripts/historico.js"></script>
+
+
+  <template id="history-card-template">
+    <article class="hitem" data-history-card>
+      <div class="hhead">
+        <div class="hcell hcell--left">
+          <img class="hart" src="/assets/profile.png" alt="Artista inicial">
+        </div>
+
+        <button class="hbtn" type="button" aria-expanded="false" aria-controls="">
+          <img class="hicon" src="/assets/icon_pureheir.svg" alt="Abrir detalhes">
+        </button>
+
+        <div class="hcell hcell--right">
+          <img class="hart" src="/assets/profile.png" alt="Artista alvo">
+        </div>
+      </div>
+
+      <section class="hexpand" hidden>
+        <div class="hgrid">
+          <div class="hcol">
+            <h3 class="hcol-title">ARTISTAS USADOS</h3>
+            <ul class="hlist" data-role="artists"></ul>
+          </div>
+
+          <div class="hcol">
+            <h3 class="hcol-title">MÚSICAS USADAS</h3>
+            <ul class="hlist" data-role="tracks"></ul>
+          </div>
+        </div>
+      </section>
+    </article>
+  </template>
+</body>
+</html>

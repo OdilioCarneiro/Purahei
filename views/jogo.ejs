@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/jogo.css">
+  </head>
+
+  <body class="game-body">
+    <header class="game-topbar">
+      <button class="game-back" type="button" onclick="window.location.href='/'">↩ VOLTAR</button>
+
+      <div class="game-title-block">
+        <!-- NOVO: wrapper para alinhar logo + nome lado a lado -->
+        <div class="brand">
+          <img src="/assets/Icon_pureheir.svg" alt="Purheíre Logo" class="game-logo-img">
+          <h1 class="game-logo">PURAHÉI</h1>
+        </div>
+
+        <p class="game-subtitle">
+          Conecte <span id="game-artist-left-label">ARTIST A</span>
+          até <span id="game-artist-right-label">ARTIST B</span>
+        </p>
+      </div>
+
+      <button class="howto-btn" type="button" onclick="toggleHowTo()">COMO JOGAR</button>
+    </header>
+
+    <main class="game-main">
+      <div class="game-sky" id="game-sky">
+        <!-- Fundo/estrelas NÃO são escalados -->
+        <div class="star-layer"></div>
+
+        <!-- Linhas NÃO são escaladas -->
+        <svg id="edges" class="edges" aria-hidden="true"></svg>
+
+        <!-- Apenas os cards ficam dentro do "mundo" que recebe scale() -->
+        <div id="game-world" class="game-world">
+          <div class="artist-card" id="card-left">
+            <div class="artist-photo">
+              <img class="artist-img" id="card-left-img" alt="Artist left">
+            </div>
+            <p class="artist-card-name" id="card-left-name"></p>
+          </div>
+
+          <div class="artist-card" id="card-right">
+            <div class="artist-photo">
+              <img class="artist-img" id="card-right-img" alt="Artist right">
+            </div>
+            <p class="artist-card-name" id="card-right-name"></p>
+          </div>
+        </div>
+      </div>
+
+      <section class="game-bottom">
+        <div class="game-input-row">
+          <input
+            id="game-input"
+            class="game-input"
+            type="text"
+            placeholder="DIGITE UMA MÚSICA DO ARTISTA ATUAL..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="game-status-row">
+          <span>ATUAL: <strong id="current-artist-label">—</strong></span>
+          <span>MÚSICAS : <strong id="songs-found">0</strong></span>
+          <span>PASSOS: <strong id="best-path">0</strong></span>
+        </div>
+      </section>
+    </main>
+
+    <!-- HOW TO -->
+    <div id="howto-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <h2>COMO JOGAR</h2>
+        <p>1. Começa no artista da esquerda.</p>
+        <p>2. Digite uma música do artista atual.</p>
+        <p>3. Escolha um feat (próximo artista) e repita até chegar no artista da direita.</p>
+        <button class="secondary" type="button" onclick="toggleHowTo()">FECHAR</button>
+      </div>
+    </div>
+
+    <!-- ESCOLHER MÚSICA -->
+    <div id="track-choices-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <h2>ESCOLHA A MÚSICA</h2>
+        <p>Selecione um resultado do Spotify.</p>
+        <div id="track-choices-list" class="win-list"></div>
+        <div class="win-actions">
+          <button class="secondary" type="button" id="btn-close-track-choices">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESCOLHER PRÓXIMO ARTISTA -->
+    <div id="artist-choices-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <h2>ESCOLHA O PRÓXIMO ARTISTA</h2>
+        <p>Qual artista dessa música vira o próximo nó?</p>
+        <div id="artist-choices-list" class="win-list"></div>
+        <div class="win-actions">
+          <button class="secondary" type="button" id="btn-close-artist-choices">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARABÉNS -->
+    <div id="win-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <h2>PARABÉNS!</h2>
+        <p>Você conectou os artistas.</p>
+        <div id="win-list" class="win-list"></div>
+        <div class="win-actions">
+          <button class="secondary" type="button" id="btn-play-again">JOGAR NOVAMENTE</button>
+          <button class="secondary" type="button" id="btn-close-win">FECHAR</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/javascripts/game.js"></script>
+  </body>
+</html>

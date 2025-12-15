@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= title %></title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/index.css">
+  </head>
+
+  <body>
+    <header class="topbar">
+      <nav class="nav">
+        <a class="nav-left" class="howto-btn" onclick="toggleHowTo()">COMO JOGAR?</a>
+        <div class="nav-right">
+          <a href="/about">SOBRE</a>
+          <a href="/historico">HISTÓRICO</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="hero">
+     <div class="brand-row">
+      <img src="/assets/Icon_pureheir.svg" alt="Logo Purheíre" class="brand-logo">
+      <h1 class="brand">PURAHÉI</h1>
+    </div>
+
+      <p class="tagline">DO PRIMEIRO FEAT AO ÚLTIMO VERSO CONECTE TUDO!!</p>
+
+      <button class="cta" type="button" onclick="window.location.href='/jogo'">Começar</button>
+
+      <section class="panel-grid">
+        <!-- PAINEL ESQUERDO -->
+        <div class="panel">
+          <div class="artist-photo">
+            <img src="/assets/profile.png"  data-placeholder="/assets/profile.png" class="artist-img" id="disc-left" alt="Artista esquerdo">
+          </div>
+
+          <p class="artist-name" id="artist-left-name"></p>
+
+          <div class="field">
+            <div class="artist-input-wrap">
+              <input
+                id="artist-left"
+                type="text"
+                placeholder="DIGITE UM(A) CANTOR(A)"
+                data-role="artist-input"
+                data-disc-target="#disc-left"
+                data-name-target="#artist-left-name"
+              >
+              <button
+                class="clear-btn"
+                type="button"
+                data-role="clear-artist"
+                data-target-input="#artist-left"
+              >
+                ✕
+              </button>
+
+              <ul
+                class="suggestions"
+                data-role="artist-suggestions"
+                data-for-input="#artist-left"
+              ></ul>
+            </div>
+          </div>
+
+          <button
+            class="secondary"
+            type="button"
+            data-role="random-artist"
+            data-target-input="#artist-left"
+          >
+            ESCOLHA POR MIM
+          </button>
+        </div>
+
+        <!-- PAINEL DIREITO -->
+        <div class="panel">
+          <div class="artist-photo">
+            <img src="/assets/profile.png" data-placeholder="/assets/profile.png" class="artist-img" id="disc-right" alt="Artista direito">
+          </div>
+
+          <p class="artist-name" id="artist-right-name"></p>
+
+          <div class="field">
+            <div class="artist-input-wrap">
+              <input
+                id="artist-right"
+                type="text"
+                placeholder="DIGITE UM(A) CANTOR(A)"
+                data-role="artist-input"
+                data-disc-target="#disc-right"
+                data-name-target="#artist-right-name"
+              >
+              <button
+                class="clear-btn"
+                type="button"
+                data-role="clear-artist"
+                data-target-input="#artist-right"
+              >
+                ✕
+              </button>
+
+              <ul
+                class="suggestions"
+                data-role="artist-suggestions"
+                data-for-input="#artist-right"
+              ></ul>
+            </div>
+          </div>
+
+          <button
+            class="secondary"
+            type="button"
+            data-role="random-artist"
+            data-target-input="#artist-right"
+          >
+            ESCOLHA POR MIM
+          </button>
+        </div>
+      </section>
+
+        <div class="divider"></div>
+
+              <p class="madeby">MADE BY DILHO</p>
+
+          <div class="big-links">
+          <a class="big-link" href="https://instagram.com" target="_blank" rel="noopener noreferrer">INSTA</a>
+          <a class="big-link" href="https://facebook.com" target="_blank" rel="noopener noreferrer">FACEBOOK</a>
+          <a class="big-link" href="mailto:odilio.carneiro63@aluno.ifce.edu.br">EMAIL</a>
+        </div>
+
+    </main>
+
+    <footer class="foot">
+      <span class="foot-left">PURAHÉI</span>
+      <span class="foot-right">©2025</span>
+    </footer>
+
+     <div id="howto-overlay" class="overlay hidden" onclick="onOverlayClick(event)">
+    <div class="overlay-box">
+      <h2>Como jogar</h2>
+      <p>1. Escolha dois artistas.</p>
+      <p>2. Busque uma música que conecte os artistas (feats).</p>
+      <p>3. Repita até alcançar o artista alvo.</p>
+
+      <button class="secondary" type="button" onclick="toggleHowTo()">FECHAR</button>
+    </div>
+  </div>
+
+    <script src="/javascripts/main.js"></script>
+  </body>
+</html>
