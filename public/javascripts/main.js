@@ -176,7 +176,7 @@ function pickRandomArtistName() {
   return SEED_ARTISTS[i];
 }
 
-// Busca lista de artistas (aceita backend que retorna array ou objeto)
+// busca lista de artistas 
 async function searchArtists(q, limit = 5) {
   const url = `/api/spotify/artist?q=${encodeURIComponent(q)}&limit=${limit}`;
   const res = await fetch(url);
@@ -245,7 +245,7 @@ function setImgToPlaceholder(imgEl) {
 }
 
 function applyArtistToUI(artist, inputEl) {
-  const imgSelector = inputEl.dataset.discTarget;   // mantém nome do atributo por compatibilidade
+  const imgSelector = inputEl.dataset.discTarget; 
   const nameSelector = inputEl.dataset.nameTarget;
 
   if (imgSelector) {
@@ -374,14 +374,22 @@ function closeAllSuggestions(exceptInputEl = null) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
- 
+  initPlaceholders();
+  initArtistInputs();
+  initDocClickHandlers();
+  initRandomButtons();
+  initClearButtons();
+});
+
+function initPlaceholders() {
   const discs = ['#disc-left', '#disc-right'];
   discs.forEach((sel) => {
     const img = document.querySelector(sel);
     if (img) getImgPlaceholder(img);
   });
+}
 
-
+function initArtistInputs() {
   document.querySelectorAll('[data-role="artist-input"]').forEach(input => {
     input.dataset.locked = input.dataset.locked === 'true' ? 'true' : 'false';
 
@@ -400,22 +408,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     input.addEventListener('focus', () => {
-   
       closeAllSuggestions(input);
       if (input.value.trim().length >= 2) handleArtistInput(input);
     });
   });
+}
 
-
+function initDocClickHandlers() {
   document.addEventListener('click', (evt) => {
     const wraps = document.querySelectorAll('.artist-input-wrap');
     for (const wrap of wraps) {
-      if (wrap.contains(evt.target)) return; 
+      if (wrap.contains(evt.target)) return;
     }
     closeAllSuggestions(null);
   });
+}
 
-
+function initRandomButtons() {
   document.querySelectorAll('[data-role="random-artist"]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const targetInputSelector = btn.dataset.targetInput;
@@ -427,8 +436,9 @@ document.addEventListener('DOMContentLoaded', () => {
       await handleArtistEnter(input);
     });
   });
+}
 
-  // Clear 
+function initClearButtons() {
   document.querySelectorAll('[data-role="clear-artist"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.querySelector(btn.dataset.targetInput);
@@ -437,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
       input.focus();
     });
   });
-});
+}
 
 
 function toggleHowTo() {

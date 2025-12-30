@@ -94,50 +94,58 @@ async function trackImageById(id) {
    Enriquecimento de win
 */
 async function enrichWin(win) {
-
   const w = JSON.parse(JSON.stringify(win || {}));
 
-  // Normaliza topo 
+  // Normalize top-level fields
   w.fromArtist = normArtist(w.fromArtist);
   w.toArtist = normArtist(w.toArtist);
   w.track = normTrack(w.track || w.lastTrack || w.music || null);
 
-  // Normaliza steps
+  // Normalize steps
   const stepsRaw = Array.isArray(w.steps) ? w.steps : [];
   w.steps = stepsRaw.map(normStep).filter(Boolean);
 
-  // Lista de ids a buscar
+  // Collect IDs and prefetch images into cache, then apply cached images
+  const { artistIds, trackIds } = collectMediaIds(w);
+  await prefetchMediaImages(artistIds, trackIds);
+  applyCachedImagesToWin(w);
+
+  return w;
+}
+
+function collectMediaIds(winObj) {
   const artistIds = new Set();
   const trackIds = new Set();
 
-  if (w.fromArtist?.id) artistIds.add(w.fromArtist.id);
-  if (w.toArtist?.id) artistIds.add(w.toArtist.id);
-  if (w.track?.id) trackIds.add(w.track.id);
+  if (winObj.fromArtist?.id) artistIds.add(winObj.fromArtist.id);
+  if (winObj.toArtist?.id) artistIds.add(winObj.toArtist.id);
+  if (winObj.track?.id) trackIds.add(winObj.track.id);
 
-  for (const s of w.steps) {
+  for (const s of (winObj.steps || [])) {
     if (s?.fromArtist?.id) artistIds.add(s.fromArtist.id);
     if (s?.toArtist?.id) artistIds.add(s.toArtist.id);
     if (s?.track?.id) trackIds.add(s.track.id);
   }
 
-  // Busca imagens em paralelo
-  await Promise.all([
-    ...[...artistIds].map(async (id) => { await artistImageById(id); }),
-    ...[...trackIds].map(async (id) => { await trackImageById(id); }),
-  ]);
+  return { artistIds, trackIds };
+}
 
-  // Aplica imagens onde estiver faltando
-  if (w.fromArtist?.id && !w.fromArtist.imageUrl) w.fromArtist.imageUrl = await artistImageById(w.fromArtist.id);
-  if (w.toArtist?.id && !w.toArtist.imageUrl) w.toArtist.imageUrl = await artistImageById(w.toArtist.id);
-  if (w.track?.id && !w.track.imageUrl) w.track.imageUrl = await trackImageById(w.track.id);
+async function prefetchMediaImages(artistIds, trackIds) {
+  const artistPromises = [...artistIds].map(id => artistImageById(id));
+  const trackPromises = [...trackIds].map(id => trackImageById(id));
+  await Promise.all([...artistPromises, ...trackPromises]);
+}
 
-  for (const s of w.steps) {
-    if (s?.fromArtist?.id && !s.fromArtist.imageUrl) s.fromArtist.imageUrl = await artistImageById(s.fromArtist.id);
-    if (s?.toArtist?.id && !s.toArtist.imageUrl) s.toArtist.imageUrl = await artistImageById(s.toArtist.id);
-    if (s?.track?.id && !s.track.imageUrl) s.track.imageUrl = await trackImageById(s.track.id);
+function applyCachedImagesToWin(winObj) {
+  if (winObj.fromArtist?.id && !winObj.fromArtist.imageUrl) winObj.fromArtist.imageUrl = cache.artistImg.get(winObj.fromArtist.id) || null;
+  if (winObj.toArtist?.id && !winObj.toArtist.imageUrl) winObj.toArtist.imageUrl = cache.artistImg.get(winObj.toArtist.id) || null;
+  if (winObj.track?.id && !winObj.track.imageUrl) winObj.track.imageUrl = cache.trackImg.get(winObj.track.id) || null;
+
+  for (const s of (winObj.steps || [])) {
+    if (s?.fromArtist?.id && !s.fromArtist.imageUrl) s.fromArtist.imageUrl = cache.artistImg.get(s.fromArtist.id) || null;
+    if (s?.toArtist?.id && !s.toArtist.imageUrl) s.toArtist.imageUrl = cache.artistImg.get(s.toArtist.id) || null;
+    if (s?.track?.id && !s.track.imageUrl) s.track.imageUrl = cache.trackImg.get(s.track.id) || null;
   }
-
-  return w;
 }
 
 /*

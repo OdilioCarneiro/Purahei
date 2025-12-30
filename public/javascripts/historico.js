@@ -75,27 +75,31 @@ function renderTrackRow(step) {
 function buildCardFromTemplate(win, idx) {
   const template = document.getElementById('history-card-template');
   if (!template) throw new Error('Template #history-card-template não encontrado no historico.ejs');
-
   const fragment = template.content.cloneNode(true);
   const card = fragment.querySelector('[data-history-card]');
-  const panel = fragment.querySelector('.hexpand');
-  const btn = fragment.querySelector('.hbtn');
 
   const from = win.fromArtist || {};
   const to = win.toArtist || {};
   const steps = Array.isArray(win.steps) ? win.steps : [];
-  const artistsUsed = uniqArtistsFromSteps(steps);
 
+  configureCardExpansion(fragment, idx);
+  setCardArtistImages(fragment, from, to);
+  populateCardLists(fragment, steps);
+
+  return card;
+}
+
+function configureCardExpansion(fragment, idx) {
+  const panel = fragment.querySelector('.hexpand');
+  const btn = fragment.querySelector('.hbtn');
   const expId = `exp-${idx}`;
-
-
   if (btn) btn.setAttribute('aria-controls', expId);
   if (panel) panel.id = expId;
+}
 
-
+function setCardArtistImages(fragment, from, to) {
   const leftImg = fragment.querySelector('.hcell--left .hart');
   const rightImg = fragment.querySelector('.hcell--right .hart');
-
   if (leftImg) {
     leftImg.src = from.imageUrl || A_PH;
     leftImg.alt = from.name || 'Artista inicial';
@@ -104,7 +108,10 @@ function buildCardFromTemplate(win, idx) {
     rightImg.src = to.imageUrl || A_PH;
     rightImg.alt = to.name || 'Artista alvo';
   }
+}
 
+function populateCardLists(fragment, steps) {
+  const artistsUsed = uniqArtistsFromSteps(steps);
   const artistsList = fragment.querySelector('[data-role="artists"]');
   const tracksList = fragment.querySelector('[data-role="tracks"]');
 
@@ -119,8 +126,6 @@ function buildCardFromTemplate(win, idx) {
       ? steps.map(renderTrackRow).join('')
       : `<li class="hrow"><span class="hlabel">Sem músicas.</span></li>`;
   }
-
-  return card;
 }
 
 function toggleCard(card) {
@@ -148,12 +153,10 @@ function toggleCard(card) {
 
 async function loadHistory() {
   const deviceId = getOrCreateDeviceId();
-  const res = await fetch(`/api/history?deviceId=${encodeURIComponent(deviceId)}`);
-  const data = await res.json();
+  const wins = await getHistoryWins(deviceId);
 
   const list = document.getElementById('history-list');
   const empty = document.getElementById('history-empty');
-  const wins = (data && data.ok && Array.isArray(data.wins)) ? data.wins : [];
 
   if (!wins.length) {
     empty?.classList.remove('hidden');
@@ -169,6 +172,17 @@ async function loadHistory() {
     const card = buildCardFromTemplate(win, idx);
     list.appendChild(card);
   });
+}
+
+async function getHistoryWins(deviceId) {
+  try {
+    const res = await fetch(`/api/history?deviceId=${encodeURIComponent(deviceId)}`);
+    const data = await res.json();
+    return (data && data.ok && Array.isArray(data.wins)) ? data.wins : [];
+  } catch (err) {
+    console.error('getHistoryWins error:', err);
+    return [];
+  }
 }
 
 document.addEventListener('click', (e) => {

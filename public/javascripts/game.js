@@ -1,8 +1,4 @@
 // public/javascripts/game.js
-
-/*
-   DOM utils
-*/
 const $ = (id) => document.getElementById(id);
 const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
@@ -15,7 +11,7 @@ function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 function pxFromPercent(p, total) { return (p / 100) * total; }
 
 /*
-   Helpers / overlays
+   Helpers
 */
 function toggleHowTo() {
   const overlay = $('howto-overlay');
@@ -242,12 +238,13 @@ function endPointerDrag(cardEl, s, e) {
 }
 
 function stepPhysics(boundsEl, cardEl, s) {
-  const { w: bw, h: bh } = getWorldSize(boundsEl);
-  const w = cardEl.offsetWidth;
-  const h = cardEl.offsetHeight;
+  applyForces(s);
+  updatePosition(s);
+  enforceBounds(boundsEl, cardEl, s);
+}
 
-  const spring = 0.18, damping = 0.80, friction = 0.985, bounce = 0.65;
-
+function applyForces(s) {
+  const spring = 0.18, damping = 0.80, friction = 0.985;
   if (s.dragging && s.moved) {
     s.vx = (s.vx + (s.tx - s.x) * spring) * damping;
     s.vy = (s.vy + (s.ty - s.y) * spring) * damping;
@@ -255,9 +252,18 @@ function stepPhysics(boundsEl, cardEl, s) {
     s.vx *= friction;
     s.vy *= friction;
   }
+}
 
+function updatePosition(s) {
   s.x += s.vx;
   s.y += s.vy;
+}
+
+function enforceBounds(boundsEl, cardEl, s) {
+  const { w: bw, h: bh } = getWorldSize(boundsEl);
+  const w = cardEl.offsetWidth;
+  const h = cardEl.offsetHeight;
+  const bounce = 0.65;
 
   const minX = w / 2, maxX = bw - w / 2;
   const minY = h / 2, maxY = bh - h / 2;
@@ -269,7 +275,18 @@ function stepPhysics(boundsEl, cardEl, s) {
 }
 
 function createFloatingDraggable(cardEl, boundsEl, initialPercentLeft, initialPercentTop) {
-  const s = {
+  const s = createDraggableState();
+  const DRAG_SLOP = 6;
+  const apply = (nowMs) => applyFloatingStyle(cardEl, s, nowMs);
+
+  initPosition(boundsEl, s, initialPercentLeft, initialPercentTop, apply);
+
+  attachDraggableHandlers(cardEl, boundsEl, s, DRAG_SLOP);
+  startDraggableTick(boundsEl, cardEl, s, apply);
+}
+
+function createDraggableState() {
+  return {
     x: 0, y: 0,
     vx: 0, vy: 0,
     tx: 0, ty: 0,
@@ -281,17 +298,16 @@ function createFloatingDraggable(cardEl, boundsEl, initialPercentLeft, initialPe
     downX: 0, downY: 0,
     moved: false
   };
+}
 
-  const DRAG_SLOP = 6;
-  const apply = (nowMs) => applyFloatingStyle(cardEl, s, nowMs);
-
-  initPosition(boundsEl, s, initialPercentLeft, initialPercentTop, apply);
-
+function attachDraggableHandlers(cardEl, boundsEl, s, slop) {
   cardEl.addEventListener('pointerdown', (e) => beginPointerDrag(cardEl, boundsEl, s, e));
-  cardEl.addEventListener('pointermove', (e) => movePointerDrag(boundsEl, s, e, DRAG_SLOP));
+  cardEl.addEventListener('pointermove', (e) => movePointerDrag(boundsEl, s, e, slop));
   cardEl.addEventListener('pointerup', (e) => endPointerDrag(cardEl, s, e));
   cardEl.addEventListener('pointercancel', (e) => endPointerDrag(cardEl, s, e));
+}
 
+function startDraggableTick(boundsEl, cardEl, s, apply) {
   function tick(now) {
     stepPhysics(boundsEl, cardEl, s);
     apply(now);
@@ -467,28 +483,7 @@ async function saveWinToHistory() {
     const track = lastStep?.track;
     if (!track?.id) return;
 
-    const payload = {
-      deviceId: getOrCreateDeviceId(),
-      fromArtist: {
-        id: fromInfo.id,
-        name: fromInfo.name,
-        imageUrl: fromInfo.imageUrl || null,
-        spotifyUrl: spotifyArtistUrl(fromInfo.id),
-      },
-      toArtist: {
-        id: toInfo.id,
-        name: toInfo.name,
-        imageUrl: toInfo.imageUrl || null,
-        spotifyUrl: spotifyArtistUrl(toInfo.id),
-      },
-      track: {
-        id: track.id,
-        name: track.name,
-        imageUrl: null,
-        spotifyUrl: spotifyTrackUrl(track.id),
-      },
-      steps: pathSteps, 
-    };
+    const payload = buildWinPayload(fromInfo, toInfo, track);
 
     const res = await fetch('/api/history/win', {
       method: 'POST',
@@ -503,6 +498,31 @@ async function saveWinToHistory() {
   } catch (err) {
     console.error('saveWinToHistory error:', err);
   }
+}
+
+function buildWinPayload(fromInfo, toInfo, track) {
+  return {
+    deviceId: getOrCreateDeviceId(),
+    fromArtist: {
+      id: fromInfo.id,
+      name: fromInfo.name,
+      imageUrl: fromInfo.imageUrl || null,
+      spotifyUrl: spotifyArtistUrl(fromInfo.id),
+    },
+    toArtist: {
+      id: toInfo.id,
+      name: toInfo.name,
+      imageUrl: toInfo.imageUrl || null,
+      spotifyUrl: spotifyArtistUrl(toInfo.id),
+    },
+    track: {
+      id: track.id,
+      name: track.name,
+      imageUrl: null,
+      spotifyUrl: spotifyTrackUrl(track.id),
+    },
+    steps: pathSteps,
+  };
 }
 
 function tryWinAfterNewConnection() {
@@ -577,14 +597,22 @@ function createArtistNode(artist, skyEl, xPct = 55, yPct = 55) {
 function createTrackNode(track, skyEl, nearEl) {
   if (trackNodes.has(track.id)) return trackNodes.get(track.id);
 
-  const el = createCardElement({
-    nodeType: 'track',
-    id: track.id,
-    name: track.name,
-    imageUrl: track.imageUrl || null
-  });
+  const el = createCardElement({ nodeType: 'track', id: track.id, name: track.name, imageUrl: track.imageUrl || null });
 
-  // spawn near
+  const spawn = computeSpawnFromNear(skyEl, nearEl, 190);
+  el.style.left = `${spawn.cx + spawn.offsetX}px`;
+  el.style.top = `${spawn.cy}px`;
+  el.style.transform = 'translate(-50%, -50%)';
+
+  worldEl()?.appendChild(el);
+
+  createFloatingDraggable(el, skyEl, spawn.leftPct, spawn.topPct);
+
+  trackNodes.set(track.id, el);
+  return el;
+}
+
+function computeSpawnFromNear(skyEl, nearEl, offsetX = 190) {
   const z = getZoom();
   const skyRect = skyEl.getBoundingClientRect();
   const near = nearEl.getBoundingClientRect();
@@ -595,20 +623,11 @@ function createTrackNode(track, skyEl, nearEl) {
   const cx = cxScreen / z;
   const cy = cyScreen / z;
 
-  el.style.left = `${cx + 190}px`;
-  el.style.top = `${cy}px`;
-  el.style.transform = 'translate(-50%, -50%)';
-
-  worldEl()?.appendChild(el);
-
   const { w: worldW, h: worldH } = getWorldSize(skyEl);
-  const leftPct = ((cx + 190) / Math.max(1, worldW)) * 100;
+  const leftPct = ((cx + offsetX) / Math.max(1, worldW)) * 100;
   const topPct = (cy / Math.max(1, worldH)) * 100;
 
-  createFloatingDraggable(el, skyEl, leftPct, topPct);
-
-  trackNodes.set(track.id, el);
-  return el;
+  return { cx, cy, leftPct, topPct, offsetX };
 }
 
 /*
@@ -787,12 +806,7 @@ async function applyStep(track, nextArtist) {
   if (!fromEl) return;
 
   const trackEl = createTrackNode(track, skyEl, fromEl);
-  const nextEl = createArtistNode(
-    { id: nextArtist.id, name: nextArtist.name, imageUrl: null },
-    skyEl,
-    55,
-    55
-  );
+  const nextEl = createArtistNode({ id: nextArtist.id, name: nextArtist.name, imageUrl: null }, skyEl, 55, 55);
 
   addEdge(fromEl, trackEl);
   addEdge(trackEl, nextEl);
@@ -805,6 +819,15 @@ async function applyStep(track, nextArtist) {
 
   songsFound += 1;
 
+  await updateCurrentArtistAfterSelection(nextArtist);
+
+  setSelectedArtistById(currentArtist.id);
+  updateHUD();
+
+  tryWinAfterNewConnection();
+}
+
+async function updateCurrentArtistAfterSelection(nextArtist) {
   try {
     const info = await fetchArtistInfo(nextArtist.id);
     currentArtist = info;
@@ -812,11 +835,6 @@ async function applyStep(track, nextArtist) {
   } catch {
     currentArtist = { id: nextArtist.id, name: nextArtist.name, imageUrl: null };
   }
-
-  setSelectedArtistById(currentArtist.id);
-  updateHUD();
-
-  tryWinAfterNewConnection();
 }
 
 /*
