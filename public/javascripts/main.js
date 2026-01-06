@@ -54,7 +54,7 @@ const SEED_ARTISTS = [
   'Coldplay',
   'Camila Cabello',
 
-  //HIP-HOP / R&B (internacional) 
+  //HIP-HOP / R&B 
   'Kendrick Lamar',
   'Drake',
   'Travis Scott',
@@ -82,7 +82,7 @@ const SEED_ARTISTS = [
   'Ozuna',
   'Daddy Yankee',
 
-  //ROCK / POP ROCK (internacional)
+  //ROCK / POP ROCK
   'Queen',
   'The Beatles',
   'The Rolling Stones',
@@ -108,7 +108,7 @@ const SEED_ARTISTS = [
   'U2',
   'Bon Jovi',
 
-  //BRASIL (pop / funk / rap / mpb / sertanejo) 
+  //BRASIL 
   'Ludmilla',
   'IZA',
   'Pabllo Vittar',
@@ -142,8 +142,6 @@ const SEED_ARTISTS = [
   'Racionais MC’s',
   'Emicida',
   'Criolo',
-
-  //BRASIL (rock / pop rock)
   'Legião Urbana',
   'Titãs',
   'Os Paralamas do Sucesso',

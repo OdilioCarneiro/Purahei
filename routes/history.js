@@ -46,11 +46,11 @@ function normStep(s) {
 }
 
 /* 
-   Spotify fetch + cache
+   spotify fetch + cache
 */
 const cache = {
-  artistImg: new Map(), // id -> url|null
-  trackImg: new Map(),  // id -> url|null
+  artistImg: new Map(),
+  trackImg: new Map(),
 };
 
 async function spotifyFetch(path) {
@@ -90,22 +90,19 @@ async function trackImageById(id) {
   return url;
 }
 
-/* 
-   Enriquecimento de win
-*/
+
 async function enrichWin(win) {
   const w = JSON.parse(JSON.stringify(win || {}));
 
-  // Normalize top-level fields
+
   w.fromArtist = normArtist(w.fromArtist);
   w.toArtist = normArtist(w.toArtist);
   w.track = normTrack(w.track || w.lastTrack || w.music || null);
 
-  // Normalize steps
   const stepsRaw = Array.isArray(w.steps) ? w.steps : [];
   w.steps = stepsRaw.map(normStep).filter(Boolean);
 
-  // Collect IDs and prefetch images into cache, then apply cached images
+
   const { artistIds, trackIds } = collectMediaIds(w);
   await prefetchMediaImages(artistIds, trackIds);
   applyCachedImagesToWin(w);
@@ -149,10 +146,10 @@ function applyCachedImagesToWin(winObj) {
 }
 
 /*
-   ROTAS
+   rotas
 */
 
-// POST
+// post
 router.post('/win', async (req, res, next) => {
   try {
     const b = req.body ?? {};

@@ -7,7 +7,7 @@ router.get('/ping', (req, res) => res.send('pong'));
 
 const { getAccessToken } = require('../services/spotifyAuth');
 
-/* Helpers */
+/* helpers */
 function formatTrackResponse(track) {
   return {
     id: track.id,
@@ -90,7 +90,7 @@ async function spotifyFetch(path) {
   return { ok: true, status: r.status, json };
 }
 
-// GET /api/spotify/artist?q=...&limit=5
+// get /api/spotify/artist?q=...&limit=5
 router.get('/artist', async (req, res) => {
   const q = (req.query.q || '').trim();
   const limit = Math.min(parseInt(req.query.limit || '5', 10), 10);
@@ -109,7 +109,7 @@ router.get('/artist', async (req, res) => {
   return res.json(items.map(formatArtistResponse));
 });
 
-// GET /api/spotify/artist/:id
+// get /api/spotify/artist/:id
 router.get('/artist/:id', async (req, res) => {
   const id = (req.params.id || '').trim();
   if (!id) return res.status(400).json({ ok: false, reason: 'missing_id' });
@@ -129,7 +129,7 @@ router.get('/artist/:id', async (req, res) => {
   });
 });
 
-// (compatibilidade) GET /api/spotify/track/validate?fromArtistId=...&toArtistId=...&trackQuery=...
+// compatibilidade
 router.get('/track/validate', async (req, res) => {
   const { fromArtistId, toArtistId, trackQuery, limit } = parseValidateParams(req);
 
@@ -152,7 +152,7 @@ router.get('/track/validate', async (req, res) => {
   });
 });
 
-// GET /api/spotify/track/validate-for-artist?artistId=...&trackQuery=...
+
 router.get('/track/validate-for-artist', async (req, res) => {
   const { artistId, trackQuery, limit } = parseTrackSearchParams(req);
 
@@ -181,7 +181,7 @@ router.get('/track/validate-for-artist', async (req, res) => {
   });
 });
 
-// GET /api/spotify/track/search-for-artist?artistId=...&trackQuery=...&limit=8
+
 router.get('/track/search-for-artist', async (req, res) => {
   const { artistId, trackQuery, limit } = parseTrackSearchParams(req);
 

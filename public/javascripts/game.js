@@ -34,7 +34,7 @@ function spotifyArtistUrl(id) { return `https://open.spotify.com/artist/${id}`; 
 function spotifyTrackUrl(id) { return `https://open.spotify.com/track/${id}`; }
 
 /*
-  Device id (para histórico por dispositivo)
+  device id
 */
 function getOrCreateDeviceId() {
   const key = 'purheire_device_id';
@@ -47,7 +47,7 @@ function getOrCreateDeviceId() {
 }
 
 /*
-   UI mode
+   ui
 */
 const UIMode = Object.freeze({
   PLAYING: 'PLAYING',
@@ -66,9 +66,7 @@ function setMode(mode) {
   if (mode === UIMode.PLAYING) input.focus();
 }
 
-/*
-Zoom
-*/
+/* zoom */
 let viewScale = 1;
 const ZOOM_MIN = 0.6;
 const ZOOM_MAX = 1;
@@ -112,7 +110,7 @@ function getWorldSize(boundsEl) {
 }
 
 /*
-   Artist info fetch (cache)
+   buscar informações dos artistas
 */
 const artistInfoCache = new Map();
 const artistInfoInFlight = new Map();
@@ -153,7 +151,7 @@ async function fetchArtistInfo(artistId) {
 }
 
 /* 
-   Drag
+   drag
 */
 function applyFloatingStyle(cardEl, s, nowMs) {
   cardEl.style.left = `${s.x}px`;
@@ -317,7 +315,7 @@ function startDraggableTick(boundsEl, cardEl, s, apply) {
 }
 
 /*
-   SVG edges (screen coords)
+   svg edges
 */
 const edges = []; // { id, fromEl, toEl }
 
@@ -362,7 +360,7 @@ function startEdgesLoop() {
 }
 
 /*
-   Nodes + state
+   node + state
 */
 const artistNodes = new Map(); 
 const trackNodes = new Map();  
@@ -431,7 +429,7 @@ async function setCurrentArtistById(artistId) {
 }
 
 /*
-   WIN
+   tela dde win
 */
 function buildAdjacencyFromSteps(steps) {
   const adj = new Map();
@@ -467,7 +465,7 @@ function bfsHasPath(adj, startId, targetId) {
 }
 
 /*
-  Salvar vitória no histórico (Mongo) - dispara no win
+  salvar vitória no histórico do mongo
 */
 async function saveWinToHistory() {
   try {
@@ -540,7 +538,7 @@ function tryWinAfterNewConnection() {
 }
 
 /*
-   Create nodes
+   criar node
 */
 function attachArtistClick(el, artistId) {
   on(el, 'click', (e) => {
@@ -631,7 +629,7 @@ function computeSpawnFromNear(skyEl, nearEl, offsetX = 190) {
 }
 
 /*
-   Win modal
+   win modal
 */
 function showWin() {
   const list = $('win-list');
@@ -655,7 +653,7 @@ function showWin() {
 }
 
 /*
-   API calls
+   chamadas api
 */
 async function searchTracksForArtist(artistId, trackQuery) {
   const url =
@@ -670,7 +668,7 @@ async function searchTracksForArtist(artistId, trackQuery) {
 }
 
 /*
-   Modals (no inline style)
+   modals 
 */
 function renderTrackChoices(tracks) {
   const list = $('track-choices-list');
@@ -788,7 +786,7 @@ function showArtistChoicesForTrack(track) {
 }
 
 /*
-   Apply step
+  step
 */
 function addEdge(fromEl, toEl) {
   edges.push({ id: `e-${edges.length}`, fromEl, toEl });
@@ -876,7 +874,7 @@ async function onSubmitQuery() {
 }
 
 /*
-   Boot
+   boot
 */
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = buildGameContext();
